@@ -1,18 +1,24 @@
 ﻿using SuperheroesAPI.Models;
+using System;
 
 namespace SuperheroesAPI.Services
 {
-    public static class SuperheroeFactory
+    public static class SuperHeroeFactory
     {
-        public static Superheroe CrearSuperheroe(string tipo, string nombre)
+        public static SuperHeroe CrearSuperHeroe(string tipo)
         {
-            return tipo.ToLower() switch
+            switch (tipo.ToLower())
             {
-                "arquero" => new Arquero { Nombre = nombre, Fuerza = 3 },
-                "mago" => new Mago { Nombre = nombre, Fuerza = 4 },
-                "guerrero" => new Guerrero { Nombre = nombre, Fuerza = 5 },
-                _ => throw new ArgumentException("Tipo de superhéroe desconocido")
-            };
+                case "guerrero":
+                    return new Guerrero();
+                case "mago":
+                    return new Mago();
+                case "arquero":
+                    return new Arquero();
+                // Agrega otros tipos de superhéroes según sea necesario
+                default:
+                    throw new ArgumentException("Tipo de superhéroe desconocido");
+            }
         }
     }
 

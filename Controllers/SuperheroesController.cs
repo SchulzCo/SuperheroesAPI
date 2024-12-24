@@ -8,50 +8,45 @@ namespace SuperheroesAPI.Controllers
     [Route("api/[controller]")]
     public class SuperheroesController : ControllerBase
     {
-        [HttpPost]
-        [Route("crear")]
-        public ActionResult<Superheroe> CrearSuperheroe(string tipo, string nombre)
+
+        [HttpPost("crear")]
+        public ActionResult<SuperHeroe> CrearSuperHeroe(string nombre, string tipo)
         {
-            try
-            {
-                var superheroe = SuperheroeFactory.CrearSuperheroe(tipo, nombre);
-                return Ok(superheroe);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            SuperHeroe superHeroe = SuperHeroeFactory.CrearSuperHeroe(tipo);
+            superHeroe.Nombre = nombre;
+            return Ok(superHeroe);
         }
 
-        [HttpPost]
-        [Route("visitarEnfermeria")]
-        public ActionResult<int> VisitarEnfermeria(string tipo, string nombre, int saludActual, int cantidadVisitas)
+        [HttpPost("accion")]
+        public ActionResult AccionSuperHeroe(string nombre, string tipo, string accion)
         {
-            try
-            {
-                var superheroe = SuperheroeFactory.CrearSuperheroe(tipo, nombre);
-                superheroe.Salud = saludActual;
+            SuperHeroe superHeroe = SuperHeroeFactory.CrearSuperHeroe(tipo);
+            superHeroe.Nombre = nombre;
 
-                var enfermeria = Enfermeria.Instancia;
-                if (enfermeria.PuedeRecibirVisita())
-                {
-                    enfermeria.RecibirVisita(superheroe, cantidadVisitas);
-                    return Ok(superheroe.Salud);
-                }
-                else
-                {
-                    return BadRequest("La enfermería ha alcanzado el límite de visitas.");
-                }
-            }
-            catch (ArgumentException ex)
+            if (accion.ToLower() == "atacar")
             {
-                return BadRequest(ex.Message);
+                superHeroe.Atacar();
             }
+            else if (accion.ToLower() == "defender")
+            {
+                superHeroe.Defender();
+            }
+            else
+            {
+                return BadRequest("Acción desconocida.");
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("visitarEnfermeria")]
+        public ActionResult<int> VisitarEnfermeria(string tipo, int salud, int cantidadVisitas)
+        {
+            SuperHeroe superHeroe = SuperHeroeFactory.CrearSuperHeroe(tipo);
+            superHeroe.Salud = salud;
+            int saludDespuesDeVisita = Enfermeria.Instancia.Visitar(superHeroe, cantidadVisitas);
+            return Ok(saludDespuesDeVisita);
         }
     }
-
-
-
-
-
 }
+
